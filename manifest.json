@@ -44,7 +44,7 @@
     "keybindings": [
       {
         "command": "sh.onda.capability-demo.open",
-        "key": "Cmd+Shift+D",
+        "key": "Cmd+Shift+Y",
         "when": "always",
         "label": "Open Capability Demo panel"
       }

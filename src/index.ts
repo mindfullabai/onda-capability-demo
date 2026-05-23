@@ -105,7 +105,7 @@ function panelHtml(opens: number, lastResult: string): string {
 
   <h3>Keybinding</h3>
   <div class="group">
-    <p class="hint">Cmd+Shift+D opens this panel from anywhere.</p>
+    <p class="hint">Cmd+Shift+Y opens this panel from anywhere.</p>
   </div>
 
   <h3>Theme</h3>
@@ -332,7 +332,7 @@ const plugin: OndaPluginEntry = {
       }
     });
 
-    log('Ready. Press Cmd+Shift+D or click the statusbar item to open.');
+    log('Ready. Press Cmd+Shift+Y or click the statusbar item to open.');
   },
 
   async onDeactivate() {
