@@ -1,253 +1,81 @@
-# Onda Plugin Template
+# Capability Demo — Onda Plugin Reference 🎓
 
-> Official boilerplate for building plugins for [Onda](https://onda.sh) — the AI-first terminal for macOS.
+[![Onda](https://img.shields.io/badge/Onda-plugin-a855f7)](https://onda.sh)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Template](https://img.shields.io/badge/built%20from-onda--plugin--template-blue)](https://github.com/mindfullabai/onda-plugin-template)
 
-This template gives you a TypeScript-strict scaffold, a typed bridge to the Onda host API, hot-reload via symlink, and a one-command pack-to-zip pipeline.
+> A living reference for every capability the [Onda](https://onda.sh) plugin bridge exposes. **Not** a tool you want for daily use — it's a working source-code reference. If you're building an Onda plugin, read [`src/index.ts`](src/index.ts) and copy what you need.
 
----
+## What this plugin does
 
-## What is an Onda plugin?
+Every single capability of the Onda plugin bridge is exercised by one button (or one source comment) in this plugin. Activate it once, press `Cmd+Shift+D`, and click around to see exactly what each bridge call does.
 
-An Onda plugin is a small JavaScript bundle that runs inside Onda in an isolated **Web Worker**. Plugins extend Onda by:
+## How to use
 
-- registering commands in the Command Palette
-- adding status bar items and side panels
-- subscribing to terminal output in real time
-- shelling out, making HTTP calls, reading/writing files (with explicit permission)
-- shipping custom themes, keybindings, and context-menu actions
+1. Install from the in-app plugin store (search "Capability Demo") or sideload the zip from [Releases](https://github.com/mindfullabai/onda-capability-demo/releases).
+2. Open Onda. A `🎓 demo` item appears in the right side of the status bar.
+3. Press `Cmd+Shift+D` (or click the status bar item) to open the demo panel.
+4. Click each button to fire the corresponding bridge call. The "Last result" pane shows the response.
+5. Right-click any terminal -> "Demo: Greet" to see the context-menu capability in action.
 
-Plugins live at `~/.config/onda/plugins/<plugin-id>/` and consist of a `manifest.json` plus a bundled `main.js`. Onda loads them lazily on activation events you declare in the manifest.
+## Capabilities demonstrated
 
-See the canonical capability reference in the Onda repo (`onda-plugins/README.md`) or the inline JSDoc in [`types/onda.d.ts`](./types/onda.d.ts).
+| Capability | What the demo does | Source |
+|---|---|---|
+| `commands` | Registers `…open` (opens panel) and `…greet` (context menu target) | [src/index.ts § `=== commands ===`](src/index.ts) |
+| `statusbar` | Adds a `🎓 demo` indicator, click -> `…open` command | [§ `=== statusbar ===`](src/index.ts) |
+| `notifications` | 4 buttons fire success / info / warning / error | [§ `=== notifications ===`](src/index.ts) |
+| `panel` | The whole right-side demo panel + per-button `data-action` -> `panel.onAction` | [§ `=== panel ===`](src/index.ts) |
+| `dialog` | Input dialog (text + checkbox), confirm dialog, alert dialog | [§ `=== dialog ===`](src/index.ts) |
+| `contextmenu` | "Demo: Greet" entry on the terminal context menu, wired to a command | [§ `=== contextmenu ===`](src/index.ts) |
+| `clipboard` | Read clipboard, write `Hello from plugin <timestamp>` | [§ `=== clipboard ===`](src/index.ts) |
+| `storage` | Persistent `opens` counter, bump/reset buttons | [§ `=== storage ===`](src/index.ts) |
+| `http` | Fetches `https://uselessfacts.jsph.pl/api/v2/facts/random` (whitelisted via `manifest.httpDomains`) | [§ `=== http ===`](src/index.ts) |
+| `exec` | Runs `uname -a` (whitelisted via `manifest.execPatterns`) | [§ `=== exec ===`](src/index.ts) |
+| `terminal:read` | Reads last 20 lines of the active terminal | [§ `=== terminal:read ===`](src/index.ts) |
+| `terminal:write` | Writes `echo "Hello…"` to the active terminal | [§ `=== terminal:write ===`](src/index.ts) |
+| `keybindings` | `Cmd+Shift+D` opens the panel (declared in `manifest.contributes.keybindings`) | [manifest.json](manifest.json) |
+| `themes` | Declares + activates a "Demo Dark" theme | [§ `=== themes ===`](src/index.ts) + [manifest.json](manifest.json) |
 
----
+## Read the source
 
-## Quickstart
+Single file, ~330 LOC: [**`src/index.ts`**](src/index.ts).
 
-### 1. Create your repo from this template
+The companion [`manifest.json`](manifest.json) is also worth reading — it shows every `contributes` field shape (commands, keybindings, themes), capability declarations, and the `httpDomains` / `execPatterns` allowlists that gate the corresponding bridge calls.
 
-```bash
-# Using GitHub CLI
-gh repo create my-onda-plugin --template mindfullabai/onda-plugin-template --public --clone
-cd my-onda-plugin
+## Notes & deviations from the brief
 
-# Or clone directly
-git clone https://github.com/mindfullabai/onda-plugin-template.git my-onda-plugin
-cd my-onda-plugin && rm -rf .git && git init
-```
+Discovered while implementing this plugin against the real Onda bridge:
 
-### 2. Personalize
+- **Context menu** lives at runtime only (`onda.contextMenu.register(context, item)`), not in a `manifest.contributes.contextMenu` field. The plugin registers it in `onActivate`.
+- **Keybinding** on a command is NOT declared inline on the command entry — it's a separate `contributes.keybindings` array (matches the `KeybindingContribution` type).
+- **Theme contribution shape** requires the full 20-color palette (see `ThemeContribution` in `types/onda.d.ts`). A minimal `{ background, foreground, accent }` is rejected at validation.
+- **`onda.panel.onAction(action, handler)`** is a runtime helper not yet in the public `.d.ts` typings — we cast to use it (TODO upstream PR to add it).
 
-- Rename the plugin in `manifest.json` (`id`, `name`, `description`, `author`).
-- Update `package.json` (`name`, `author`, `homepage`).
-- Edit `src/index.ts` to do whatever your plugin should do.
+## Use this as a starting point
 
-The plugin **`id`** in `manifest.json` should be globally unique. Reverse-DNS (`com.acme.git-status`) or namespaced (`acme.git-status`) are both fine. It becomes the directory name on the user's disk.
+This plugin is a **showcase**, not a template. If you want to create your own plugin, fork [`mindfullabai/onda-plugin-template`](https://github.com/mindfullabai/onda-plugin-template) instead — it's the lean scaffold this plugin was generated from.
 
-### 3. Install dependencies and build
+## Build & pack locally
 
 ```bash
 npm install
-npm run build
+npm run build       # tsup -> dist/main.js
+npm run typecheck   # tsc --noEmit
+npm run icon        # generate icon.svg + icon.png
+npm run pack        # build + create release/sh.onda.capability-demo-1.0.0.zip
+npm run link:local  # symlink into ~/.config/onda/plugins/ for hot-reload dev
 ```
 
-This produces `dist/main.js` (a single bundled IIFE Worker script).
+## Changelog
 
-### 4. Sideload into Onda for local development
-
-```bash
-npm run link:local
-```
-
-This creates a symlink at `~/.config/onda/plugins/<your-plugin-id>` pointing to this repo. Open **Onda → Settings (⌘,) → Plugins**, enable your plugin, then **⌘R** to reload after each rebuild.
-
-For watch mode:
-
-```bash
-npm run dev
-```
-
-### 5. Pack a release `.zip`
-
-```bash
-npm run pack
-# → release/<plugin-id>-<version>.zip
-```
-
-The zip contains `manifest.json`, `dist/main.js`, `README.md`, and `LICENSE`. Users can extract it into `~/.config/onda/plugins/`, or you can submit it to the Onda plugin registry (see [Publishing](#publishing)).
-
----
-
-## Project structure
-
-```
-.
-├── manifest.json              # Plugin metadata, capabilities, contributions
-├── package.json
-├── tsconfig.json              # strict TS, ES2022, WebWorker lib
-├── tsup.config.ts             # IIFE bundle, browser target, single file
-├── src/
-│   └── index.ts               # Plugin entry — assigns self.__ondaPlugin
-├── types/
-│   └── onda.d.ts              # Hand-written types for the onda.* bridge
-├── scripts/
-│   ├── link-local.mjs         # Symlink into ~/.config/onda/plugins
-│   └── pack.mjs               # Build zip artifact for distribution
-├── examples/
-│   ├── hello-world/           # Minimal command + notification
-│   └── git-status-banner/     # Statusbar item, exec, periodic poll
-└── .github/workflows/build.yml
-```
-
----
-
-## The plugin contract
-
-Onda discovers your plugin via a global assignment, **not** an ES module export:
-
-```ts
-self.__ondaPlugin = {
-  async onActivate(onda) {
-    // onda.* is the bridge — see types/onda.d.ts
-  },
-  async onDeactivate() { /* optional cleanup */ }
-};
-```
-
-The bundler (`tsup`) is configured to emit a single classic-script IIFE because Onda loads `main.js` as a **classic Worker**, not an ES module Worker. Don't switch to `format: 'esm'` unless you know the host build has been updated to use `new Worker(url, { type: 'module' })`.
-
-### Capabilities are an allow-list
-
-Every `onda.foo.bar()` call you make is gated by the `capabilities` array in `manifest.json`. Calling `onda.exec.run(...)` without `"exec"` in the capability list throws at the bridge level. Add capabilities as you need them and document _why_ in the manifest so users can grant trust intentionally.
-
-| Capability             | What it unlocks                                      |
-|------------------------|------------------------------------------------------|
-| `commands`             | Command Palette entries                              |
-| `keybindings`          | Global / focus-gated keyboard shortcuts              |
-| `statusbar`            | Status bar items (left/right)                        |
-| `panel`                | Side panels with HTML content                        |
-| `notifications`        | Toast notifications                                  |
-| `contextmenu`          | File panel / terminal right-click items              |
-| `storage`              | Persistent key-value store, namespaced per plugin    |
-| `themes`               | Register custom color themes                         |
-| `terminal:read`        | Read full terminal buffer                            |
-| `terminal:write`       | Inject keystrokes into terminals                     |
-| `terminal:subscribe`   | Real-time output events with optional regex filters  |
-| `dialog`               | Modal dialogs with input fields                      |
-| `clipboard`            | Read/write system clipboard                          |
-| `filesystem:read`      | Read files                                           |
-| `filesystem:write`     | Write files                                          |
-| `http`                 | Outbound HTTP (use `httpDomains` to scope)           |
-| `exec`                 | Run shell commands (use `execPatterns` to scope)     |
-
-### Activation events
-
-```jsonc
-{
-  "activationEvents": [
-    "onStartup",                    // lazy boot after UI mount (default)
-    "onCommand:my-plugin.do-thing", // only when user runs the command
-    "onView:my-plugin.panel",       // only when panel becomes visible
-    "*"                             // eager boot — use sparingly
-  ]
-}
-```
-
----
-
-## Hook reference (quick examples)
-
-### Command
-
-```ts
-onda.commands.register('acme.hello', {
-  title: 'Say Hello',
-  category: 'Acme',
-  handler: async () => {
-    onda.notifications.show({ type: 'success', message: 'Hello!' });
-  },
-});
-```
-
-### Terminal output subscription
-
-```ts
-// manifest.json: capabilities += ["terminal:subscribe"]
-const sub = await onda.terminal.subscribe({
-  terminalId: 'active',
-  patterns: ['ERROR', 'WARN'],
-});
-onda.on('terminal:output', (e) => {
-  if (e.data.includes('ERROR')) {
-    onda.notifications.show({ type: 'error', message: 'Build error detected' });
-  }
-});
-```
-
-### Status bar + panel
-
-```ts
-await onda.statusBar.addItem({
-  id: 'acme-status',
-  text: 'Acme',
-  icon: 'wrench',
-  position: 'right',
-  onClick: 'acme.toggle-panel',
-});
-
-await onda.panel.register({
-  id: 'acme-panel',
-  title: 'Acme',
-  position: 'right',
-  width: 320,
-});
-await onda.panel.setContent('acme-panel', '<div style="padding:16px;color:#eee">Hello</div>');
-
-onda.commands.register('acme.toggle-panel', {
-  title: 'Toggle Acme Panel',
-  handler: () => onda.panel.toggle('acme-panel'),
-});
-```
-
-### Shell exec
-
-```ts
-// manifest.json: capabilities += ["exec"]
-const { stdout, code } = await onda.exec.run('git status --porcelain');
-if (code === 0 && stdout.trim() === '') {
-  onda.notifications.show({ message: 'Working tree clean' });
-}
-```
-
-See the [`examples/`](./examples) directory for full plugins you can copy.
-
----
-
-## Publishing
-
-The Onda plugin registry at <https://onda.sh/publish> is **coming soon** (tracked in Onda's roadmap as P4.11). Until then:
-
-1. Run `npm run pack` to produce `release/<id>-<version>.zip`.
-2. Distribute via GitHub Releases — the workflow in [`.github/workflows/build.yml`](.github/workflows/build.yml) builds and attaches the zip automatically on every push and tag.
-3. Users install by extracting the zip into `~/.config/onda/plugins/`.
-
-When the registry launches, you'll submit by signing in with GitHub and pointing at a release tag — no rebuild required.
-
----
-
-## TypeScript notes
-
-- `strict`, `noUncheckedIndexedAccess`, `noImplicitOverride` are all on.
-- The `types/onda.d.ts` file is hand-maintained against the Onda 1.x bridge. If your build of Onda exposes new APIs, extend the file locally and consider opening a PR upstream.
-- Don't import from `'../types/onda'` at runtime — they're type-only. Use `import type`.
-
-## Troubleshooting
-
-- **"Plugin failed to activate"**: open Onda DevTools (⌘⌥I) and check the Console — Worker errors include stack traces, prefixed with `[PluginWorker]`.
-- **"Capability denied"**: add the capability to `manifest.json` and reload.
-- **Changes don't show up**: did you `npm run build`? did you ⌘R the renderer? did you restart Onda after editing `manifest.json` (manifest changes require a full restart, code changes don't).
-- **`self is not defined` in tests**: tests run in Node, not a Worker. Mock `self.__ondaPlugin` or run unit tests against pure functions extracted from the entry.
+### 1.0.0
+- Initial release. Covers all 14 capabilities currently exposed by the Onda plugin bridge.
 
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT — see [LICENSE](LICENSE).
+
+---
+
+Built by [Mario Mosca](https://mariomosca.dev) / [Mindful Lab AI](https://github.com/mindfullabai). Questions? Open an issue.

@@ -1,26 +1,82 @@
 {
-  "id": "your-org.your-plugin-id",
-  "name": "Your Plugin Name",
-  "version": "0.1.0",
-  "description": "Short, user-facing description of what this plugin does.",
+  "id": "sh.onda.capability-demo",
+  "name": "Capability Demo",
+  "version": "1.0.0",
+  "description": "Reference plugin showing every Onda plugin bridge capability in action. Read the source for working examples.",
   "author": {
-    "name": "Your Name",
-    "email": "you@example.com",
-    "url": "https://example.com"
+    "name": "Mario Mosca / Mindful Lab AI",
+    "url": "https://github.com/mindfullabai/onda-capability-demo"
   },
+  "icon": "icon.png",
   "main": "dist/main.js",
   "capabilities": [
     "commands",
+    "statusbar",
     "notifications",
-    "storage"
+    "panel",
+    "dialog",
+    "contextmenu",
+    "clipboard",
+    "storage",
+    "http",
+    "exec",
+    "terminal:read",
+    "terminal:write",
+    "keybindings",
+    "themes"
   ],
   "activationEvents": ["onStartup"],
+  "httpDomains": ["uselessfacts.jsph.pl"],
+  "execPatterns": ["^uname"],
   "contributes": {
     "commands": [
       {
-        "id": "your-org.your-plugin-id.hello",
-        "title": "Say Hello",
-        "category": "Your Plugin"
+        "id": "sh.onda.capability-demo.open",
+        "title": "Capability Demo: Open Panel",
+        "category": "Capability Demo"
+      },
+      {
+        "id": "sh.onda.capability-demo.greet",
+        "title": "Capability Demo: Greet (context menu demo)",
+        "category": "Capability Demo"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "sh.onda.capability-demo.open",
+        "key": "Cmd+Shift+D",
+        "when": "always",
+        "label": "Open Capability Demo panel"
+      }
+    ],
+    "themes": [
+      {
+        "id": "demo-dark",
+        "name": "Demo Dark (showcase only)",
+        "isDark": true,
+        "colors": {
+          "bgPrimary": "#0a0a14",
+          "bgSecondary": "#12121f",
+          "bgTertiary": "#1a1a2e",
+          "bgHover": "#22223a",
+          "bgActive": "#2b2b46",
+          "textPrimary": "#f0f0ff",
+          "textSecondary": "#c8c8e0",
+          "textMuted": "#8080a0",
+          "textInverse": "#0a0a14",
+          "borderPrimary": "#2b2b46",
+          "borderSecondary": "#1a1a2e",
+          "borderFocus": "#a855f7",
+          "accent": "#a855f7",
+          "accentHover": "#c084fc",
+          "accentMuted": "#6b21a8",
+          "success": "#10b981",
+          "warning": "#f59e0b",
+          "error": "#ef4444",
+          "info": "#3b82f6",
+          "terminal": "#050510",
+          "selection": "#a855f755"
+        }
       }
     ]
   },

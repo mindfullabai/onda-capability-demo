@@ -1,29 +1,34 @@
 {
-  "name": "@your-org/onda-plugin-yourname",
-  "version": "0.1.0",
-  "description": "An Onda terminal plugin built from the official template.",
+  "name": "@mindfullabai/onda-capability-demo",
+  "version": "1.0.0",
+  "description": "Reference Onda plugin demonstrating every plugin bridge capability.",
   "private": false,
   "license": "MIT",
   "author": {
-    "name": "Your Name",
-    "email": "you@example.com",
-    "url": "https://example.com"
+    "name": "Mario Mosca / Mindful Lab AI",
+    "url": "https://github.com/mindfullabai/onda-capability-demo"
   },
   "homepage": "https://onda.sh",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mindfullabai/onda-capability-demo.git"
+  },
   "main": "dist/main.js",
   "files": [
     "dist",
     "manifest.json",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "icon.png"
   ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "echo \"(no tests yet) — add vitest or your test runner of choice\" && exit 0",
+    "test": "echo \"(no tests — this is a reference showcase)\" && exit 0",
     "pack": "npm run build && node scripts/pack.mjs",
     "typecheck": "tsc --noEmit",
-    "link:local": "node scripts/link-local.mjs"
+    "link:local": "node scripts/link-local.mjs",
+    "icon": "node scripts/make-icon.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
@@ -34,6 +39,9 @@
     "onda",
     "onda-plugin",
     "terminal",
-    "plugin"
+    "plugin",
+    "reference",
+    "showcase",
+    "demo"
   ]
 }
